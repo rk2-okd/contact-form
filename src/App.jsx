@@ -8,6 +8,12 @@ import MessageInput from "./components/MessageInput";
 import PrivacyPolicyInput from "./components/PrivacyPolicyInput";
 import TransmissionResults from "./components/TransmissionResults";
 
+const initialFormData = {
+  fullName: '',
+  kanaName: '',
+  email: '',
+  domain: '',
+};
 const App = () => {
   // 送信されているかどうかの定義
   const [isFirstSubmitted, setIsFirstSubmitted] = useState(false);
@@ -21,10 +27,6 @@ const App = () => {
   // 完了コメント
   const [comment, setComment] = useState("");
 
-  //名前の定義
-  const [kanjiName, setKanjiName] = useState("");
-  //ナマエの定義
-  const [kanaName, setFuriganaName] = useState("");
   //ナマエが間違っているときの定義（入っているか以上の判断をしたいもののみ定義
   const [errorFurigana, setErrorFurigana] = useState("");
 
@@ -69,24 +71,13 @@ const App = () => {
 
   // 送信文が間違っているときのメッセージ
   const [error, seterror] = useState("");
-
-  // onchangekanjiName関数　名前が変わったとき
-  // 入力フィールドが変更されるたび、これが実行されkanjiNameに入っているフィールドが現在入っているものに置き換わる
-  const onChangeKanjiName = (e) => {
-    setKanjiName(e.target.value);
-  };
-  // ナマエが変わったとき
-  const onChangeKanaName = (e) => {
-    e.preventDefault();
-    setFuriganaName(e.target.value);
-  };
-  // メール(@より前）が変わったとき
-  const onChangeEmail = (e) => {
-    setEmail(e.target.value);
-  };
-  // メール(@より後）が変わったとき
-  const onChangeDomain = (e) => {
-    setSelectedDomain(e.target.value);
+  const [formData, setFormData] = useState(initialFormData);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      [name]: value,
+    }));
   };
   // 郵便番号が変わったとき
   const onChangePostCode = (e) => {
@@ -185,10 +176,12 @@ const App = () => {
     // メールアドレス(@よりまえ)の形式が正しいか
     const validLocalPartRegex = /^[a-zA-Z0-9._-]+$/;
     setTimeout(() => {
+        console.log("submit check", formData, {
+        postcode, streetNumber, kindsmessage, message, privacyAgreed
+      });
       if (
         //お名前が入力されているか,
-        kanjiName === "" ||
-        kanaName === "" ||
+        formData.fullName === "" ||
         //メールアドレスが入力されているか
         email === "" ||
         selectedDomain === "" ||
@@ -203,13 +196,13 @@ const App = () => {
         setSubmitComment("");
         return; //条件が満たされた場合以降の処理を中断するため、returnを返す
       } // ナマエが入っていない、もしくはナマエが形式とあっていない
-      if (kanaName === "" || !kanaRegex.test(kanaName)) {
+      if (formData.fullName !== "" || !kanaRegex.test(kanaName)) {
         setErrorFurigana("フリガナはカタカナで入力してください。");
         seterror("入力に誤りがあります");
         setSubmitComment("");
         return;
       } // メールアドレス(@よりまえ)が入っていない、もしくはメールアドレス(@よりまえ)が形式とあっていない
-      if (email === "" || !validLocalPartRegex.test(email)) {
+      if (formData.email === "" || !validLocalPartRegex.test(email)) {
         setErrorMail("メールアドレスの形式が正しくありません。");
         seterror("入力に誤りがあります");
         setSubmitComment("");
@@ -397,19 +390,6 @@ const App = () => {
       setIsSecondSubmitted(true);
       setIsSecondSubmitting(false);
     }, 1000);
-    // setKanjiName("");
-    // setFuriganaName("");
-    // setEmail("");
-    // setChrome("");
-    // setStreetNumber("");
-    // setHouseNumber("");
-    // setApartmentName("");
-    // setApartmentTower("");
-    // setApartmentNumber("");
-    // setMessage("");
-    // setKindsMessage("");
-    // setSelectedDomain("");
-    // setPostCode("");
     setPrivacyAgreed(false);
 
     setErrorDices("");
@@ -421,20 +401,20 @@ const App = () => {
       <h2 className="text-xl pt-3 mb-3 font-bold">お問合わせ</h2>
       {!isFirstSubmitted ? (
         <div className="pt-8 items-center">
-          <form className="w-full max-w-lg" onSubmit={firstHandleSubmit}>
+          <form className="w-full max-w-xl" onSubmit={firstHandleSubmit}>
             <NameInput
-              kanjiName={kanjiName}
-              onChangeKanjiName={onChangeKanjiName}
-              kanaName={kanaName}
-              onChangeKanaName={onChangeKanaName}
+              onChangeFullName={handleChange}
+              fullNameValue={formData.fullName}
+              onChangeKanaName={handleChange}
+              kanaNameValue={formData.kanaName}
               errorFurigana={errorFurigana}
             />
             <MailAddressInput
-              email={email}
-              onChangeEmail={onChangeEmail}
+              onChangeEmail={handleChange}
+              email={formData.email}
               errorMail={errorMail}
-              selectedDomain={selectedDomain}
-              onChangeDomain={onChangeDomain}
+              selectedDomain={formData.domain}
+              onChangeDomain={handleChange}
               domainOptions={domainOptions}
             />
 
@@ -453,7 +433,7 @@ const App = () => {
               apartmentName={apartmentName}
               onChangeApartmentName={onChangeApartmentName}
               apartmentTower={apartmentTower}
-              onChangeApartmentTower={apartmentTower}
+              onChangeApartmentTower={onChangeApartmentTower}
               apartmentNumber={apartmentNumber}
               onChangeApartmentNumber={onChangeApartmentNumber}
             />
@@ -537,7 +517,7 @@ const App = () => {
             </div>
           ) : (
             <TransmissionResults
-              kanjiName={kanjiName}
+              fullName={formData.fullName}
               kanaName={kanaName}
               comment={comment}
               email={email}
