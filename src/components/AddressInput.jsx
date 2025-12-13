@@ -4,7 +4,14 @@ const AddressInput = ({
   postcode,
   onChangePostCode,
   errorPostcode,
-  address,
+
+  address = { prefecture: "", city: "", town: "" }, // ★ここ重要
+  setAddress = () => {}, // ★念のため
+
+  onClickSearchAddress,
+  isSearchingAddress,
+  errorAddressSearch,
+
   chrome,
   onChangeChrome,
   streetNumber,
@@ -18,144 +25,166 @@ const AddressInput = ({
   onChangeApartmentTower,
   apartmentNumber,
   onChangeApartmentNumber,
-  kindsmessage,
-  message,
 }) => {
   return (
     <>
-      <div className="w-full mb-3">
-        <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-          住所
-        </label>
-        <p className="text-left">郵便番号(ハイフンなし)（必須）</p>
-        <input
-          className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-          type="text"
-          minLength={7}
-          maxLength={7}
-          placeholder="xxxxxxx"
-          value={postcode}
-          onChange={onChangePostCode}
-        />
-        {postcode === "" && (
-          <p className="text-red-500 text-xs italic">
-            郵便番号を入力してください。
-          </p>
-        )}
-      </div>
-      {errorPostcode && <p style={{ color: "red" }}>{errorPostcode}</p>}
-      <div className="mb-6 ml-20">
-        <div>
-          <label>都道府県 </label>
-          <input
-            className="items-start ml-8"
-            type="text"
-            value={address.prefecture}
-            readOnly
-          />
-        </div>
-        <div>
-          <label>市町村 </label>
-          <input
-            className="items-start ml-12"
-            type="text"
-            value={address.city}
-            readOnly
-          />
-        </div>
-        <div>
-          <label>町名 </label>
-          <input
-            className="items-start ml-16"
-            type="text"
-            value={address.town}
-            readOnly
-          />
-        </div>
-      </div>
-
-      {/* 手入力住所 */}
-      <div className="flex flex-wrap -mx-3 mb-6">
-        <div className="md:w-1/3 px-3">
+      <div className="flex flex-wrap -mx-3 mb-4 items-end">
+        <div className="w-full md:w-2/3 px-3">
           <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-            丁目
+            郵便番号（必須）
           </label>
           <input
             className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             type="text"
-            placeholder="1"
+            value={postcode}
+            onChange={onChangePostCode}
+            placeholder="例）1234567"
+          />
+          {errorPostcode && <p style={{ color: "red" }}>{errorPostcode}</p>}
+        </div>
+
+        <div className="w-full md:w-1/3 px-3">
+          <button
+            type="button"
+            onClick={onClickSearchAddress}
+            disabled={isSearchingAddress}
+            className="shadow bg-gray-600 hover:bg-gray-500 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded w-full"
+          >
+            {isSearchingAddress ? "検索中..." : "住所を表示"}
+          </button>
+        </div>
+
+        {errorAddressSearch && (
+          <div className="w-full px-3 mt-2">
+            <p style={{ color: "red" }}>{errorAddressSearch}</p>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap -mx-3 mb-6">
+        <div className="w-full md:w-1/3 px-3">
+          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+            都道府県（任意）
+          </label>
+          <input
+            className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+            type="text"
+            value={address?.prefecture ?? ""}
+            onChange={(e) =>
+              setAddress((prev) => ({ ...(prev ?? {}), prefecture: e.target.value }))
+            }
+          />
+        </div>
+
+        <div className="w-full md:w-1/3 px-3">
+          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+            市区町村（任意）
+          </label>
+          <input
+            className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+            type="text"
+            value={address?.city ?? ""}
+            onChange={(e) =>
+              setAddress((prev) => ({ ...(prev ?? {}), city: e.target.value }))
+            }
+          />
+        </div>
+
+        <div className="w-full md:w-1/3 px-3">
+          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+            町名（任意）
+          </label>
+          <input
+            className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+            type="text"
+            value={address?.town ?? ""}
+            onChange={(e) =>
+              setAddress((prev) => ({ ...(prev ?? {}), town: e.target.value }))
+            }
+          />
+        </div>
+      </div>
+
+      {/* 以下はあなたの既存をそのまま */}
+      {/* 丁目 */}
+      <div className="flex flex-wrap -mx-3 mb-6">
+        <div className="w-full md:w-1/3 px-3">
+          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+            丁目（任意）
+          </label>
+          <input
+            className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+            type="text"
             value={chrome}
             onChange={onChangeChrome}
           />
         </div>
-        <div className="md:w-1/3 px-3">
+
+        <div className="w-full md:w-1/3 px-3">
           <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
             番地（必須）
           </label>
           <input
             className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             type="text"
-            placeholder="11"
             value={streetNumber}
             onChange={onChangeStreetNumber}
           />
-          {streetNumber === "" && (
-            <p className="text-red-500 text-xs italic">
-              番地のみ必須入力です。
-            </p>
-          )}
         </div>
-        <div className="md:w-1/3 px-3">
+
+        <div className="w-full md:w-1/3 px-3">
           <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-            号
+            号（任意）
           </label>
           <input
             className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             type="text"
-            placeholder="11"
             value={houseNumber}
             onChange={onChangeHouseNumber}
           />
         </div>
+
         {errorStreetOrHouse && (
-          <p style={{ color: "red" }}>{errorStreetOrHouse}</p>
+          <div className="w-full px-3 mt-2">
+            <p style={{ color: "red" }}>{errorStreetOrHouse}</p>
+          </div>
         )}
       </div>
 
-      {/* マンション */}
       <div className="flex flex-wrap -mx-3 mb-6">
-        <div className="w-full md:w-1/3 px-3">
+        <div className="w-full px-3">
           <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-            マンション名
+            マンション名（任意）
           </label>
           <input
             className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             type="text"
-            placeholder="マンション名"
             value={apartmentName}
             onChange={onChangeApartmentName}
           />
         </div>
-        <div className="w-full md:w-1/3 px-3">
+      </div>
+
+      <div className="flex flex-wrap -mx-3 mb-6">
+        <div className="w-full md:w-1/2 px-3">
           <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-            棟
+            棟番号（任意）
           </label>
           <input
             className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             type="text"
-            placeholder="棟名"
             value={apartmentTower}
             onChange={onChangeApartmentTower}
           />
         </div>
-        <div className="w-full md:w-1/3 px-3">
+
+        <div className="w-full md:w-1/2 px-3">
           <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-            部屋番号
+            室番号（任意）
           </label>
           <input
             className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             type="text"
-            placeholder="部屋番号"
             value={apartmentNumber}
             onChange={onChangeApartmentNumber}
           />

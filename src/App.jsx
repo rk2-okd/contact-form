@@ -183,8 +183,8 @@ const App = () => {
         //お名前が入力されているか,
         formData.fullName === "" ||
         //メールアドレスが入力されているか
-        email === "" ||
-        selectedDomain === "" ||
+        formData.email === "" ||
+        formData.selectedDomain === "" ||
         postcode === "" ||
         streetNumber === "" ||
         kindsmessage === "" ||
@@ -196,18 +196,18 @@ const App = () => {
         setSubmitComment("");
         return; //条件が満たされた場合以降の処理を中断するため、returnを返す
       } // ナマエが入っていない、もしくはナマエが形式とあっていない
-      if (formData.fullName !== "" || !kanaRegex.test(kanaName)) {
-        setErrorFurigana("フリガナはカタカナで入力してください。");
-        seterror("入力に誤りがあります");
-        setSubmitComment("");
-        return;
-      } // メールアドレス(@よりまえ)が入っていない、もしくはメールアドレス(@よりまえ)が形式とあっていない
-      if (formData.email === "" || !validLocalPartRegex.test(email)) {
-        setErrorMail("メールアドレスの形式が正しくありません。");
-        seterror("入力に誤りがあります");
-        setSubmitComment("");
-        return;
-      }
+      // if (formData.fullName !== "" || !kanaRegex.test(kanaName)) {
+      //   setErrorFurigana("フリガナはカタカナで入力してください。");
+      //   seterror("入力に誤りがあります");
+      //   setSubmitComment("");
+      //   return;
+      // } // メールアドレス(@よりまえ)が入っていない、もしくはメールアドレス(@よりまえ)が形式とあっていない
+      // if (formData.email === "" || !validLocalPartRegex.test(email)) {
+      //   setErrorMail("メールアドレスの形式が正しくありません。");
+      //   seterror("入力に誤りがあります");
+      //   setSubmitComment("");
+      //   return;
+      // }
       if (postcode === "" || isNaN(postcode)) {
         setErrorPostCode("郵便番号の形式が正しくありません。");
         seterror("入力に誤りがあります");
@@ -518,7 +518,7 @@ const App = () => {
           ) : (
             <TransmissionResults
               fullName={formData.fullName}
-              kanaName={kanaName}
+              kanaName={formDatakanaName}
               comment={comment}
               email={email}
               selectedDomain={selectedDomain}
